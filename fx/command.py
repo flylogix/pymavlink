@@ -177,8 +177,8 @@ class ChangeHeadingCommand(Command):
     def calculate_destination(lon_start, lat_start, heading, d):
         R = 6378.1  # Radius of the Earth (km)
 
-        lat_end = lat_start - d / R * math.cos(heading)
-        lon_end = lon_start + d / R * math.sin(heading)
+        lat_end = lat_start + d / R * math.cos(heading)
+        lon_end = lon_start + d / R * math.sin(heading) / math.cos(lat_start)
 
         return lon_end, lat_end
 
