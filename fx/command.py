@@ -151,7 +151,7 @@ class ChangeHeadingCommand(Command):
             raise TypeError("Missing lon, lat, heading or alt value")
         Nm_2_km = 1.852
         rad_2_deg = 180 / math.pi
-        distance = 150 * Nm_2_km
+        distance = 10 * Nm_2_km
         lon_new, lat_new = self.calculate_destination(
             kwargs["lon"], kwargs["lat"], kwargs["heading"], distance
         )
@@ -175,10 +175,23 @@ class ChangeHeadingCommand(Command):
 
     @staticmethod
     def calculate_destination(lon_start, lat_start, heading, d):
+        # Equation taken from http://www.movable-type.co.uk/scripts/latlong.html
+        # Rhumb line destination calculation
+        # Matches Mission Planner behaviour [Rich N, June 2022]
         R = 6378.1  # Radius of the Earth (km)
+        d_rad = d / R
 
-        lat_end = lat_start + d / R * math.cos(heading)
-        lon_end = lon_start + d / R * math.sin(heading) / math.cos(lat_start)
+        lat_end = lat_start + d_rad * math.cos(heading)
+        delta_psi = math.log(
+            math.tan(lat_end / 2 + math.pi / 4) / math.tan(lat_start / 2 + math.pi / 4)
+        )
+        if delta_psi == 0:
+            q = math.cos(lat_start)
+        else:
+            q = (lat_end - lat_start) / delta_psi
+
+        delta_lon = d_rad * math.sin(heading) / q
+        lon_end = lon_start + delta_lon
 
         return lon_end, lat_end
 
