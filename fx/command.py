@@ -210,10 +210,18 @@ class SetModeCommand(Command):
     def serialize_payload(self, *args, **kwargs) -> bytes:
         if "mode" not in kwargs:
             raise TypeError("Missing mode value")
-        payload = self.ms.mav.set_mode_encode(
+        payload = self.ms.mav.command_long_encode(
             self.ms.target_system,
-            mavutil.mavlink.MAV_MODE_FLAG_CUSTOM_MODE_ENABLED,
-            int(kwargs["mode"]),
+            self.ms.target_component,
+            mavutil.mavlink.MAV_CMD_DO_SET_MODE,  # command
+            0,  # confirmation
+            mavutil.mavlink.MAV_MODE_FLAG_CUSTOM_MODE_ENABLED,  # param 1
+            int(kwargs["mode"]),  # param 2
+            0,  # param 3
+            0,  # param 4
+            0,  # param 5
+            0,  # param 6
+            0,  # param 7
         )
         return payload.pack(self.ms.mav)
 
