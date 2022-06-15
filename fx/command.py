@@ -151,7 +151,7 @@ class ChangeHeadingCommand(Command):
             raise TypeError("Missing lon, lat, heading or alt value")
         Nm_2_km = 1.852
         rad_2_deg = 180 / math.pi
-        distance = 150 * Nm_2_km
+        distance = 10 * Nm_2_km
         lon_new, lat_new = self.calculate_destination(
             kwargs["lon"], kwargs["lat"], kwargs["heading"], distance
         )
@@ -175,10 +175,23 @@ class ChangeHeadingCommand(Command):
 
     @staticmethod
     def calculate_destination(lon_start, lat_start, heading, d):
+        # Equation taken from http://www.movable-type.co.uk/scripts/latlong.html
+        # Rhumb line destination calculation
+        # Matches Mission Planner behaviour [Rich N, June 2022]
         R = 6378.1  # Radius of the Earth (km)
+        d_rad = d / R
 
-        lat_end = lat_start + d / R * math.cos(heading)
-        lon_end = lon_start + d / R * math.sin(heading) / math.cos(lat_start)
+        lat_end = lat_start + d_rad * math.cos(heading)
+        delta_psi = math.log(
+            math.tan(lat_end / 2 + math.pi / 4) / math.tan(lat_start / 2 + math.pi / 4)
+        )
+        if delta_psi == 0:
+            q = math.cos(lat_start)
+        else:
+            q = (lat_end - lat_start) / delta_psi
+
+        delta_lon = d_rad * math.sin(heading) / q
+        lon_end = lon_start + delta_lon
 
         return lon_end, lat_end
 
@@ -197,10 +210,18 @@ class SetModeCommand(Command):
     def serialize_payload(self, *args, **kwargs) -> bytes:
         if "mode" not in kwargs:
             raise TypeError("Missing mode value")
-        payload = self.ms.mav.set_mode_encode(
+        payload = self.ms.mav.command_long_encode(
             self.ms.target_system,
-            mavutil.mavlink.MAV_MODE_FLAG_CUSTOM_MODE_ENABLED,
-            int(kwargs["mode"]),
+            self.ms.target_component,
+            mavutil.mavlink.MAV_CMD_DO_SET_MODE,  # command
+            0,  # confirmation
+            mavutil.mavlink.MAV_MODE_FLAG_CUSTOM_MODE_ENABLED,  # param 1
+            int(kwargs["mode"]),  # param 2
+            0,  # param 3
+            0,  # param 4
+            0,  # param 5
+            0,  # param 6
+            0,  # param 7
         )
         return payload.pack(self.ms.mav)
 
