@@ -86,7 +86,7 @@ class Context:
             payload += self._delimiter
         return struct.pack(
             ">HH{}s".format(len(payload)),
-            len(bytes([self._command.ms.target_system]) + payload),
+            struct.calcsize(">HH") + len(payload),
             self._command.ms.target_system,
             payload,
         )
