@@ -4,6 +4,7 @@ import struct
 from enum import Enum
 
 from pymavlink.fx.mav import MavSerializer
+from pymavlink.fx.packet import pack, unpack
 
 from pymavlink import mavutil
 
@@ -83,13 +84,8 @@ class Context:
         if not self._use_fx_format:
             return payload
         if self._delimiter:
-            payload += self._delimiter
-        return struct.pack(
-            ">HH{}s".format(len(payload)),
-            len(bytes([self._command.ms.target_system]) + payload),
-            self._command.ms.target_system,
-            payload,
-        )
+            return pack(self._command.ms.target_system, payload, self._delimiter)
+        return pack(self._command.ms.target_system, payload)
 
 
 class HeartbeatCommand(Command):
