@@ -275,3 +275,45 @@ class PreflightCalibrationCommand(Command):
             0,  # param 7
         )
         return payload.pack(self.ms.mav)
+
+
+class EnableSeekopsPumpCommand(Command):
+    def serialize_payload(self, *args, **kwargs) -> bytes:
+        payload = self.ms.mav.mission_item_encode(
+            self.ms.target_system,
+            self.ms.target_component,
+            0,  # sequence
+            0,  # frame MAV_FRAME_GLOBAL
+            183,  # cmd MAV_CMD_DO_SET_SERVO
+            0,  # current. Contrary to the official documentation, current IS NOT a boolean (╯°□°)╯︵ ┻━┻. A value of 3 means change of altitude only
+            0,  # autocontinue
+            10,  # param 1 Servo instance number.
+            1900,  # param 2 Pulse Width Modulation.
+            0,  # param 3
+            0,  # param 4
+            0,  # lat
+            0,  # lon
+            0,  # param 7
+        )
+        return payload.pack(self.ms.mav)
+
+
+class DisableSeekopsPumpCommand(Command):
+    def serialize_payload(self, *args, **kwargs) -> bytes:
+        payload = self.ms.mav.mission_item_encode(
+            self.ms.target_system,
+            self.ms.target_component,
+            0,  # sequence
+            0,  # frame MAV_FRAME_GLOBAL
+            183,  # cmd MAV_CMD_DO_SET_SERVO
+            0,  # current. Contrary to the official documentation, current IS NOT a boolean (╯°□°)╯︵ ┻━┻. A value of 3 means change of altitude only
+            0,  # autocontinue
+            10,  # param 1 Servo instance number.
+            1100,  # param 2 Pulse Width Modulation.
+            0,  # param 3
+            0,  # param 4
+            0,  # lat
+            0,  # lon
+            0,  # param 7
+        )
+        return payload.pack(self.ms.mav)
