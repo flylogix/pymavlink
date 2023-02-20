@@ -106,7 +106,7 @@ class custom_build_py(build_py):
         build_py.run(self)
 
 
-setup (name = 'pymavlink',
+setup (name = 'fx_pymavlink',
        version = version,
        description = 'Python MAVLink code',
        long_description = ('A Python library for handling MAVLink protocol streams and log files. This allows for the '
@@ -176,7 +176,8 @@ setup (name = 'pymavlink',
             'lxml',
        ],
        setup_requires=[
-           'future'  # future is required by mavgen, included by this file
+           'future',  # future is required by mavgen, included by this file
+           'lxml'
        ],
        cmdclass={'build_py': custom_build_py},
        ext_modules = extensions
