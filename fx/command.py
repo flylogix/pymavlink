@@ -277,7 +277,7 @@ class PreflightCalibrationCommand(Command):
         return payload.pack(self.ms.mav)
 
 
-class EnableSeekopsPumpCommand(Command):
+class EnableExtPowerRelayCommand(Command):
     def serialize_payload(self, *args, **kwargs) -> bytes:
         payload = self.ms.mav.command_long_encode(
             self.ms.target_system,
@@ -295,7 +295,7 @@ class EnableSeekopsPumpCommand(Command):
         return payload.pack(self.ms.mav)
 
 
-class DisableSeekopsPumpCommand(Command):
+class DisableExtPowerRelayCommand(Command):
     def serialize_payload(self, *args, **kwargs) -> bytes:
         payload = self.ms.mav.command_long_encode(
             self.ms.target_system,
