@@ -314,7 +314,7 @@ class DisableExtPowerRelayCommand(Command):
 
 class GetWaypointListCountCommand(Command):
     def serialize_payload(self, *args, **kwargs) -> bytes:
-        payload = self.ms.mav.waypoint_request_list_encode(
+        payload = self.ms.mav.mission_request_list_encode(
             self.ms.target_system,
             self.ms.target_component,
         )
@@ -324,7 +324,7 @@ class GetWaypointListItemCommand(Command):
     def serialize_payload(self, *args, **kwargs) -> bytes:
         if "seq" not in kwargs:
             raise TypeError("Missing seq value")
-        payload = self.ms.mav.waypoint_request_encode(
+        payload = self.ms.mav.mission_request_encode(
             self.ms.target_system,
             self.ms.target_component,
             int(kwargs["seq"]),
