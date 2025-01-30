@@ -96,6 +96,21 @@ class HeartbeatCommand(Command):
         return payload.pack(self.ms.mav)
 
 
+class SendTimeSync(Command):
+    def serialize_payload(self, *args, **kwargs) -> bytes:
+        if "tc1" not in kwargs:
+            raise TypeError("Missing tc1 value")
+        if "ts1" not in kwargs:
+            raise TypeError("Missing ts1 value")
+        payload = self.ms.mav.timesync_encode(
+            self.ms.target_system,
+            self.ms.target_component,
+            int(kwargs["tc1"]),
+            int(kwargs["ts1"]),
+        )
+        return payload.pack(self.ms.mav)
+
+
 class ArmCommand(Command):
     def serialize_payload(self, *args, **kwargs) -> bytes:
         if "arm" not in kwargs:
