@@ -103,8 +103,6 @@ class SendTimeSync(Command):
         if "ts1" not in kwargs:
             raise TypeError("Missing ts1 value")
         payload = self.ms.mav.timesync_encode(
-            self.ms.target_system,
-            self.ms.target_component,
             int(kwargs["tc1"]),
             int(kwargs["ts1"]),
         )
