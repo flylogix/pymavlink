@@ -1,3 +1,7 @@
+import os
+
+os.environ["MAVLINK20"] = "1"
+
 from abc import ABC, abstractmethod
 import math
 import struct
@@ -346,6 +350,26 @@ class GetWaypointListItemCommand(Command):
 
 class SendMissionAckCommand(Command):
     def serialize_payload(self, *args, **kwargs) -> bytes:
+        payload = self.ms.mav.mission_ack_encode(
+            self.ms.target_system,
+            self.ms.target_component,
+            0,  # OK
+        )
+        return payload.pack(self.ms.mav)
+
+class GetWaypointsListCommand(Command):
+    def serialize_payload(self, *args, **kwargs) -> bytes:
+        # Read Mission waypoints from airframe
+        self.ms.mav.mission_request_list_send(self.ms.target_system, self.ms.target_component, mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
+        waypoint_count = 0
+        msg = self.ms.recv_match(type=['MISSION_COUNT'],blocking=True)
+        waypoint_count = msg.count
+        print(f'{msg.count} Mission waypoints loaded')
+        for i in range(waypoint_count):
+            self.ms.waypoint_request_send(i)
+            msg = self.ms.recv_match(type=['MISSION_ITEM'],blocking=True)
+            print(f'Receiving Mission waypoint {msg.seq}: {msg.x},{msg.y} {msg.z}')       
+            #print(msg)
         payload = self.ms.mav.mission_ack_encode(
             self.ms.target_system,
             self.ms.target_component,
