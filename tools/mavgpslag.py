@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 '''
 calculate GPS lag from DF log
@@ -14,8 +14,6 @@ The code really only works when there is significant acceleration as well.
 You'll need to fly quite aggressively on a copter to get a result.
 
 '''
-from __future__ import print_function
-from builtins import range
 
 import os
 
@@ -23,7 +21,7 @@ from argparse import ArgumentParser
 parser = ArgumentParser(description=__doc__)
 parser.add_argument("--plot", action='store_true', default=False, help="plot errors")
 parser.add_argument("--minspeed", type=float, default=6, help="minimum speed")
-parser.add_argument("--gps", default='', help="GPS number")
+parser.add_argument("--gps", type=int, default=0, help="GPS number")
 parser.add_argument("logs", metavar="LOG", nargs="+")
 
 args = parser.parse_args()
@@ -83,13 +81,17 @@ def gps_lag(logfile):
     dtcount = 0
 
     while True:
-        m = mlog.recv_match(type=['GPS'+args.gps,'IMU','ATT','GPA'+args.gps])
+        m = mlog.recv_match(type=['GPS','IMU','ATT','GPA'])
         if m is None:
             break
         t = m.get_type()
         if t.startswith('GPS') and m.Status >= 3 and m.Spd>args.minspeed:
+            if m.I != args.gps:
+                continue
             GPS = m;
         elif t.startswith('GPA') and GPS is not None and GPS.TimeUS == m.TimeUS:
+            if m.I != args.gps:
+                continue
             v = Vector3(GPS.Spd*cos(radians(GPS.GCrs)), GPS.Spd*sin(radians(GPS.GCrs)), GPS.VZ)
             vel.append(v)
             timestamps.append(m.SMS*0.001)
@@ -97,6 +99,8 @@ def gps_lag(logfile):
         elif t == 'ATT':
             ATT = m
         elif t == 'IMU':
+            if m.I != 0:
+                continue
             if ATT is not None:
                 ga = earth_accel_df(m, ATT)
                 ga.z += 9.80665

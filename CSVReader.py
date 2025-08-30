@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 '''
 CSV log file reader
 
@@ -20,12 +20,10 @@ MAV> graph CSV.GYRO_X
 in this case the GPS time was in seconds-since-week-start, so a conversion to ms is required
 
 '''
-from __future__ import print_function
-from builtins import range
-from builtins import object
 
 import csv
 import struct
+import os
 
 from . import mavutil
 from . import mavextra
@@ -89,6 +87,8 @@ class CSVReader(object):
                  timestamp_expression=None,
                  ):
 
+        separator = os.environ.get("CSV_SEPARATOR", separator)
+
         self.messages = { 'MAV' : self }
         self.filename = filename
         self.separator = separator
@@ -100,6 +100,7 @@ class CSVReader(object):
         self.verbose = False
         self.f = None
         self.linecount = None
+        self.params = {}
 
         self._rewind()  # opens files etc etc
         self.recv_msg()  # populate self.messages
