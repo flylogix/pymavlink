@@ -8,10 +8,9 @@ concurrency:
 
 jobs:
   build:
-
     runs-on: ubuntu-22.04
     strategy:
-      fail-fast: false  # don't cancel if a job from the matrix fails
+      fail-fast: false # don't cancel if a job from the matrix fails
       matrix:
         python-version: ['3.7', '3.8', '3.9', '3.10', '3.11', '3.12', '3.x']
 
@@ -33,7 +32,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '16'
-
       - name: Lint with flake8
         run: |
           # stop the build if there are Python syntax errors or undefined names

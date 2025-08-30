@@ -535,9 +535,12 @@ class mavfile(object):
     def fx_recv_msg(self):
         '''message receive routine'''
         self.pre_message()
+        packet_bytes = b''
         while True:
             n = self.mav.bytes_needed()
             s = self.recv(n)
+            if isinstance(s, bytes):
+               packet_bytes += s
             numnew = len(s)
 
             if numnew != 0:
@@ -554,12 +557,13 @@ class mavfile(object):
                     usec = int(time.time() * 1.0e6) & ~3
                     self.logfile.write(str(struct.pack('>Q', usec) + msg.get_msgbuf()))
                 self.post_message(msg)
-                return (msg, s)
+                return (msg, packet_bytes)
             else:
                 # if we failed to parse any messages _and_ no new bytes arrived, return immediately so the client has the option to
                 # timeout
                 if numnew == 0:
                     return (None, None)
+                
 
     def fx_recv_match(self, condition=None, type=None, blocking=False, timeout=None):
         '''recv the next MAVLink message that matches the given condition
@@ -567,6 +571,7 @@ class mavfile(object):
         if type is not None and not isinstance(type, list) and not isinstance(type, set):
             type = [type]
         start_time = time.time()
+        packet_bytes = b''
         while True:
             if timeout is not None:
                 now = time.time()
@@ -575,6 +580,8 @@ class mavfile(object):
                 if start_time + timeout < time.time():
                     return (None, None)
             m,s = self.fx_recv_msg()
+            if isinstance(s, bytes):
+                packet_bytes += s
             if m is None:
                 if blocking:
                     for hook in self.idle_hooks:
@@ -589,7 +596,7 @@ class mavfile(object):
                 continue
             if not evaluate_condition(condition, self.messages):
                 continue
-            return (m, s)
+            return (m, packet_bytes)
 
     def check_condition(self, condition):
         '''check if a condition is true'''
@@ -1376,6 +1383,8 @@ class mavtcp(mavfile):
                 self.port.close()
                 self.port = None
             self.do_connect()
+        else:
+            sys.exit(0)
 
 
 class mavtcpin(mavfile):

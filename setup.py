@@ -158,7 +158,7 @@ if build_fast_index:
         )
     ], language_level=3)
 
-setup (name = 'pymavlink',
+setup (name = 'fx_pymavlink',
        version = __version__,
        description = 'Python MAVLink code',
        long_description = long_description,
@@ -192,6 +192,7 @@ setup (name = 'pymavlink',
                         'pymavlink'              : ['message_definitions/v*/*.xml']
                         },
        packages = ['pymavlink',
+                   'pymavlink.fx',
                    'pymavlink.generator',
                    'pymavlink.dialects',
                    'pymavlink.dialects.v10',
