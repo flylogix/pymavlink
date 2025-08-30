@@ -1,12 +1,10 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 '''
 parse a MAVLink protocol XML file and generate an Objective-C implementation
 
 Copyright John Boiles 2013
 Released under GNU GPL version 3 or later
 '''
-from __future__ import print_function
-
 import os
 from . import mavparse, mavtemplate
 
@@ -21,7 +19,7 @@ def generate_mavlink(directory, xml):
 //  MAVLink communications protocol built from ${basename}.xml
 //
 //  Created on ${parse_time} by mavgen_objc.py
-//  http://qgroundcontrol.org/mavlink
+//  https://mavlink.io/en/
 //
 
 #import "MVMessage.h"
@@ -47,7 +45,7 @@ ${{message_definition_files:#import "MV${name_camel_case}Messages.h"
  @param mavlink The MVMavlink object calling this method
  @param data NSData object containing the bytes to be sent
  */
-- (BOOL)mavlink:(MVMavlink *)mavlink shouldWriteData:(NSData *)data;
+- (MAV_BOOL)mavlink:(MVMavlink *)mavlink shouldWriteData:(NSData *)data;
 
 @end
 
@@ -72,7 +70,7 @@ ${{message_definition_files:#import "MV${name_camel_case}Messages.h"
  @param message Object conforming to the MVMessage protocol that represents the data to be sent
  @return YES if message sending was successful
  */
-- (BOOL)sendMessage:(id<MVMessage>)message;
+- (MAV_BOOL)sendMessage:(id<MVMessage>)message;
 
 @end
 ''', xml)
@@ -84,7 +82,7 @@ ${{message_definition_files:#import "MV${name_camel_case}Messages.h"
 //  MAVLink communications protocol built from ${basename}.xml
 //
 //  Created by mavgen_objc.py
-//  http://qgroundcontrol.org/mavlink
+//  https://mavlink.io/en/
 //
 
 #import "MVMavlink.h"
@@ -105,7 +103,7 @@ ${{message_definition_files:#import "MV${name_camel_case}Messages.h"
   }
 }
 
-- (BOOL)sendMessage:(id<MVMessage>)message {
+- (MAV_BOOL)sendMessage:(id<MVMessage>)message {
   return [_delegate mavlink:self shouldWriteData:[message data]];
 }
 
@@ -122,7 +120,7 @@ def generate_base_message(directory, xml):
 //  MAVLink communications protocol built from ${basename}.xml
 //
 //  Created by mavgen_objc.py
-//  http://qgroundcontrol.org/mavlink
+//  https://mavlink.io/en/
 //
 
 #import "mavlink.h"
@@ -164,7 +162,7 @@ def generate_base_message(directory, xml):
 //  MAVLink communications protocol built from ${basename}.xml
 //
 //  Created by mavgen_objc.py
-//  http://qgroundcontrol.org/mavlink
+//  https://mavlink.io/en/
 //
 
 #import "MVMessage.h"
@@ -237,7 +235,7 @@ def generate_message_definitions_h(directory, xml):
 //  MAVLink communications protocol built from ${basename}.xml
 //
 //  Created by mavgen_objc.py
-//  http://qgroundcontrol.org/mavlink
+//  https://mavlink.io/en/
 //
 
 ${{message:#import "MVMessage${name_camel_case}.h"
@@ -254,7 +252,7 @@ def generate_message(directory, m):
 //  MAVLink communications protocol built from ${basename}.xml
 //
 //  Created by mavgen_objc.py
-//  http://qgroundcontrol.org/mavlink
+//  https://mavlink.io/en/
 //
 
 #import "MVMessage.h"
@@ -282,7 +280,7 @@ ${{fields://! ${description}
 //  MAVLink communications protocol built from ${basename}.xml
 //
 //  Created by mavgen_objc.py
-//  http://qgroundcontrol.org/mavlink
+//  https://mavlink.io/en/
 //
 
 #import "MVMessage${name_camel_case}.h"

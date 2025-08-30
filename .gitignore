@@ -22,3 +22,9 @@ include/
 include/mavlink/v1.0
 *.pyc
 /bin/
+/.vscode
+.idea/
+.venv/
+dfindexer/dfindexer_cy.c
+dfindexer/*.so
+dfindexer/*.pyd
