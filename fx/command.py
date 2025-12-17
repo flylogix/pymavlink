@@ -335,14 +335,23 @@ class GetWaypointListCountCommand(Command):
 
 class GetWaypointListItemCommand(Command):
     def serialize_payload(self, *args, **kwargs) -> bytes:
-        if "seq" not in kwargs:
-            raise TypeError("Missing seq value")
-        payload = self.ms.mav.mission_request_encode(
-            self.ms.target_system,
-            self.ms.target_component,
-            int(kwargs["seq"]),
-        )
-        return payload.pack(self.ms.mav)
+        if "count" in kwargs:
+            seq = range(int(kwargs["count"]))
+        elif "seq" in kwargs:
+            seq = kwargs["seq"]
+            if not isinstance(seq, list):
+                seq = [int(seq)]
+        else:
+            raise TypeError("Missing seq or count value")
+        payload_data = bytearray()
+        for s in seq:
+            payload = self.ms.mav.mission_request_encode(
+                self.ms.target_system,
+                self.ms.target_component,
+                s,
+            )
+            payload_data += payload.pack(self.ms.mav)
+        return bytes(payload_data)
 
 class SendMissionAckCommand(Command):
     def serialize_payload(self, *args, **kwargs) -> bytes:
